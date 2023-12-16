@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ """
 from models.base_model import BaseModel
+from models import storage
 import unittest
 import datetime
 from uuid import UUID
@@ -56,6 +57,23 @@ class test_basemodel(unittest.TestCase):
             j = json.load(f)
             self.assertEqual(j[key], i.to_dict())
 
+    def test_save_and_reload(self):
+        """ Testing save and reload """
+        i = self.value()
+        i.save()
+        key = self.name + "." + i.id
+
+        # Modify the instance after saving
+        i.name = "Updated Name"
+        i.save()
+
+        # Reload the instance
+        new_instance = self.value()
+        new_instance.reload()
+
+        # Ensure reloaded instance reflects modifications
+        self.assertEqual(new_instance.name, "Updated Name")
+
     def test_str(self):
         """ """
         i = self.value()
@@ -97,3 +115,7 @@ class test_basemodel(unittest.TestCase):
         n = new.to_dict()
         new = BaseModel(**n)
         self.assertFalse(new.created_at == new.updated_at)
+
+if __name__ == "__main__":
+    unittest.main()
+
